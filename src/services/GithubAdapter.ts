@@ -15,7 +15,7 @@ export class GithubAdapter {
         return await getCommits(this.contextCommitSHA);
     }
 
-    async getCommitsSinceSha(sha:string):GitCommit[]{
+    async getCommitsSinceSha(sha:string):Promise<GitCommit[]>{
         return await getCommits(sha);
     }
 
