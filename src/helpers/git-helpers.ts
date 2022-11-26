@@ -11,12 +11,12 @@ function gitLogToGitCommit(commitSting:string){
         author: lines[1].split(":")[1].trim(),
         authorDateString: lines[2].split(":")[1].trim(),
         authorHandle: lines[3].split(":")[1].trim(),
-        commitDateString: lines[3].split(":")[1].trim(),
-        title: lines[4].trim(),
+        commitDateString: lines[4].split(":")[1].trim(),
+        title: lines[5].trim(),
     } as GitCommit;
 
-    if(lines.length > 5){
-        gc.message = lines[5].trim()
+    if(lines.length > 6){
+        gc.message = lines[6].trim()
     }
     return gc;
 }

@@ -15,13 +15,20 @@ export class GitReleaseNotes {
         return await this.gitAdapter.getCommitsSinceSha(sha);
     }
 
-    async getNotesFromSha(sha:string){
+    async getNotesFromSha(sha:string):Promise<GitCommit[]>{
         const gitCommits = await this.getLogsFromSha(sha);
-        const selectedCommits = gitCommits.filter(commit => {
-            return commit.title.match(this.jiraAdapter.getJIRARegexp());
+        return gitCommits.filter(commit => {
+            const matchResult = commit.title.match(this.jiraAdapter.getJIRARegexp());
+            if(matchResult != null) {
+                commit.jiraKey = matchResult[0];
+            }
+            return matchResult != null;
         });
-        console.log("selected commits");
-        console.log(selectedCommits);
+    }
+
+    async getNotesWithJira(sha:string):Promise<GitCommit[]>{
+        const commits = await this.getNotesFromSha(sha);
+        return this.jiraAdapter.fillFromJira(commits);
     }
 
 }

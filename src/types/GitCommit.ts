@@ -5,5 +5,8 @@ export interface GitCommit {
     authorHandle: string,
     commitDateString: string,
     title: string,
-    message?: string
+    message?: string,
+    jiraKey?: string,
+    summary?: string,
+    status?: string
 }
