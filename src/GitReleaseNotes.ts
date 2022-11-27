@@ -21,13 +21,12 @@ export class GitReleaseNotes {
             const matchResult = commit.title.match(this.jiraAdapter.getJIRARegexp());
             if(matchResult != null) {
                 commit.jiraKey = matchResult[0];
-                console.log(commit);
             }
             return matchResult != null;
         });
     }
 
-    async getNotesWithJira(sha:string):Promise<GitCommit[]>{
+    async getNotesWithJira(sha:string):Promise<string[]>{
         let commits:GitCommit[] =[];
         try {
             commits = await this.getNotesFromSha(sha);
@@ -37,7 +36,26 @@ export class GitReleaseNotes {
         }
 
         commits = await this.jiraAdapter.fillFromJira(commits);
-        return commits;
+        return commits.map((c) => {
+            return this.getNoteString(c);
+        });
+    }
+
+    getNoteString(commit:GitCommit):string{
+        return  `${this.getJIRAKeyString(commit)}: ${this.getGitJiraSummary(commit)}`;
+    }
+
+    getJIRAKeyString(commit:GitCommit):string {
+        return `[${commit.jiraKey}](${commit.jiraUrl})`
+    }
+
+    getGitJiraSummary(commit:GitCommit):string{
+        if(commit.summary){
+            return `${commit.summary} [${commit.jiraStatus}]`
+        }
+        else {
+            return `${commit.title}`
+        }
     }
 
 }

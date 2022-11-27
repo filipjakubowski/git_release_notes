@@ -9,4 +9,5 @@ export interface GitCommit {
     jiraKey?: string,
     summary?: string,
     jiraStatus?: string
+    jiraUrl?: string
 }

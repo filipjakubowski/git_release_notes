@@ -30,7 +30,12 @@ export class JiraAdapter {
      async fillFromJira(commits: GitCommit[]):Promise<GitCommit[]>{
 
          await Promise.all(commits.map(async (commit) => {
-             await this.getJiraIssue(commit);
+             try{
+                 await this.getJiraIssue(commit);
+             }
+             catch (error){
+                 console.log(error);
+             }
          }));
         return commits;
     }
@@ -52,12 +57,12 @@ export class JiraAdapter {
     }
 
     private axiosConfigForJiraKey(jiraKey: string): AxiosRequestConfig{
-        return{
+        return {
             method: "GET",
             url: this.issueUrl(jiraKey),
             auth: {
                 username: this.jiraUsername,
-                password: this.jiraPassword
+                password: this.jiraPassword,
             },
             headers: {
                 'Accept': "application/json",
@@ -70,6 +75,7 @@ export class JiraAdapter {
     private updateCommiitWithJiraResponse(commit: GitCommit, data: JiraRepsonse):GitCommit{
         commit.summary = data.fields.summary;
         commit.jiraStatus = data.fields.status.name;
+        commit.jiraUrl = `${this.jiraURL}/browse/${commit.jiraKey}`;
         return commit;
     }
 
