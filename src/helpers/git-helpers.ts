@@ -23,17 +23,44 @@ function gitLogToGitCommit(commitSting:string){
 
 export async function getCommits(sha: string): Promise<GitCommit[]> {
     let commits: GitCommit[] = [];
+    let times = 0;
+    let buffer: string =""
+    let commitLines: string[] = [];
 
     const options = {
         listeners: {
             stdout: (data: Buffer) => {
-                const commit = gitLogToGitCommit(data.toString());
-                commits.push(commit);
+                const newBuffer = buffer + data.toString();
+                buffer =  "";
+                const bufferSplit = newBuffer.split("commit ")
+                // this entry might be not finished
+                buffer += "commit " + bufferSplit.pop();
+                bufferSplit.forEach(trimmedCommitLine => {
+                    commitLines.push("commit " + trimmedCommitLine);
+                })
+            },
+            stderr: (data: Buffer) => {
+                console.log(`Command Error: $[data.toString()}`);
             }
         }
     };
 
     const args: string[] = ["log", "--format=fuller", `${sha}..HEAD`];
-    await exec.exec("git", args, options);
+    try{
+        await exec.exec("git", args, options);
+    }
+    catch (error){
+        console.log("Error while git log. ");
+        console.log(error);
+    }
+
+    commitLines.push(buffer);
+    commitLines.forEach(commitLine => {
+        if(commitLine.length > 'commitLine '.length){
+            const commit = gitLogToGitCommit(commitLine);
+            commits.push(commit);
+        }
+    });
+
     return commits;
 }

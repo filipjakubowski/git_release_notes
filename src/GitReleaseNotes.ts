@@ -21,6 +21,7 @@ export class GitReleaseNotes {
             const matchResult = commit.title.match(this.jiraAdapter.getJIRARegexp());
             if(matchResult != null) {
                 commit.jiraKey = matchResult[0];
+                console.log(commit);
             }
             return matchResult != null;
         });

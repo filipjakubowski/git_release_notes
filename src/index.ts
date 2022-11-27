@@ -28,7 +28,7 @@ let rn = new GitReleaseNotes(ga,ja);
 let notes:GitCommit[] = [];
 (async () => {
     let notes:any;
-    notes = await rn.getNotesWithJira("5b86e08fe883079770adc7f5e099b6980bcbea01");
+    notes = await rn.getNotesWithJira("5b86e08");
     console.log("Notes");
     console.log(notes);
     return notes;
