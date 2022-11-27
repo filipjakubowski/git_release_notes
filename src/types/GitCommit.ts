@@ -8,5 +8,5 @@ export interface GitCommit {
     message?: string,
     jiraKey?: string,
     summary?: string,
-    status?: string
+    jiraStatus?: string
 }

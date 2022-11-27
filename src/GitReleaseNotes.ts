@@ -27,8 +27,16 @@ export class GitReleaseNotes {
     }
 
     async getNotesWithJira(sha:string):Promise<GitCommit[]>{
-        const commits = await this.getNotesFromSha(sha);
-        return this.jiraAdapter.fillFromJira(commits);
+        let commits:GitCommit[] =[];
+        try {
+            commits = await this.getNotesFromSha(sha);
+        }
+        catch (error){
+            console.log(error);
+        }
+
+        commits = await this.jiraAdapter.fillFromJira(commits);
+        return commits;
     }
 
 }
