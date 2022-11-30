@@ -21,7 +21,7 @@ function gitLogToGitCommit(commitSting:string){
     return gc;
 }
 
-export async function getCommits(sha: string): Promise<GitCommit[]> {
+export async function getCommits(fronSha: string, toSha: string): Promise<GitCommit[]> {
     let commits: GitCommit[] = [];
     let buffer: string = ""
     let commitLines: string[] = [];
@@ -39,12 +39,12 @@ export async function getCommits(sha: string): Promise<GitCommit[]> {
                 })
             },
             stderr: (data: Buffer) => {
-                console.log(`Command Error: $[data.toString()}`);
+                console.log(`Command Error: ${data.toString()}`);
             }
         }
     };
 
-    const args: string[] = ["log", "--format=fuller", `${sha}..HEAD`];
+    const args: string[] = ["log", "--format=fuller", `${fronSha}..${toSha}`];
     try{
         await exec.exec("git", args, options);
     }

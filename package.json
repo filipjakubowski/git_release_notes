@@ -1,9 +1,10 @@
 {
   "name": "@bamboostick/git_release_notes",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "author": "@filipjakubowski",
   "description": "Release Notes build strategies combining git and ticketing systems like JIRA.",
   "main": "./dist/index.js",
+  "files": ["dist", "src"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf ./dist && tsc",

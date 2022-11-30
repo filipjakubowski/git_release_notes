@@ -3,7 +3,7 @@ import {GithubAdapter} from "./services/GithubAdapter";
 import {JiraAdapter, JiraTypeEnum} from "./services/JiraAdapter";
 
 module.exports = {
-    releaseNotesString: (fromSha: string) => {
+    releaseNotesString: (fromSha: string, toSha: string) => {
         const jiraUrl = process.env.JIRA_URL!;
         const jiraUser = process.env.JIRA_USER!;
         const jiraPat = process.env.JIRA_PASS_PWA!;
@@ -18,7 +18,7 @@ module.exports = {
 
         (async () => {
             let notes:any;
-            notes = await rn.getNotesStringWithJira(fromSha);
+            notes = await rn.getNotesStringWithJira(fromSha, toSha);
             console.log("Notes:");
             console.log(notes);
             return notes;

@@ -11,12 +11,12 @@ export class GitReleaseNotes {
         this.jiraAdapter = jiraAdapter;
     }
 
-    async getLogsFromSha(sha:string): Promise<GitCommit[]>{
-        return await this.gitAdapter.getCommitsSinceSha(sha);
+    async getLogsFromSha(fromSha:string, toSha:string): Promise<GitCommit[]>{
+        return await this.gitAdapter.getCommitsSinceSha(fromSha, toSha);
     }
 
-    async getNotesFromSha(sha:string):Promise<GitCommit[]>{
-        const gitCommits = await this.getLogsFromSha(sha);
+    async getNotesFromSha(fromSha:string, toSha:string):Promise<GitCommit[]>{
+        const gitCommits = await this.getLogsFromSha(fromSha, toSha);
         return gitCommits.filter(commit => {
             const matchResult = commit.title.match(this.jiraAdapter.getJIRARegexp());
             if(matchResult != null) {
@@ -26,10 +26,10 @@ export class GitReleaseNotes {
         });
     }
 
-    async getNotesWithJira(sha:string):Promise<string[]>{
+    async getNotesWithJira(fromSha:string, toSha: string):Promise<string[]>{
         let commits:GitCommit[] =[];
         try {
-            commits = await this.getNotesFromSha(sha);
+            commits = await this.getNotesFromSha(fromSha, toSha);
         }
         catch (error){
             console.log(error);
@@ -41,8 +41,8 @@ export class GitReleaseNotes {
         });
     }
 
-    async getNotesStringWithJira(sha:string):Promise<string>{
-        const notes = await this.getNotesWithJira(sha);
+    async getNotesStringWithJira(fromSha:string, toSha: string):Promise<string>{
+        const notes = await this.getNotesWithJira(fromSha, toSha);
         var notesString= "";
         notes.forEach(n=>{
             notesString += n + "\n";
