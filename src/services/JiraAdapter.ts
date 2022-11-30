@@ -2,7 +2,6 @@ import {GitCommit} from "../types/GitCommit";
 
 import axios, {AxiosRequestConfig} from "axios";
 const https = require('https');
-import fs from 'fs';
 
 import {JiraRepsonse} from "../types/JiraRepsonse";
 
@@ -67,24 +66,34 @@ export class JiraAdapter {
     }
 
     private axiosConfigForJiraKey(jiraKey: string): AxiosRequestConfig{
-        const config = {
-            method: "GET",
-            url: this.issueUrl(jiraKey),
-            auth: {
-                username: this.jiraUsername,
-                password: this.jiraPassword,
-            },
-            headers: {
-                'Accept': "application/json",
-                'Content-Type': 'application/json',
-                'Accept-Encoding': ''
-            },
-            httpAgent: new https.Agent()
+        if(this.jiraType == JiraTypeEnum.CLOUD){
+            return {
+                method: "GET",
+                url: this.issueUrl(jiraKey),
+                auth: {
+                    username: this.jiraUsername,
+                    password: this.jiraPassword,
+                },
+                headers: {
+                    'Accept': "application/json",
+                    'Content-Type': 'application/json',
+                    'Accept-Encoding': ''
+                }
+            }
         }
-        if(this.jiraType == JiraTypeEnum.SERVER){
-            config.httpAgent = new https.Agent({ rejectUnauthorized: false })
+        else {
+            return {
+                method: "GET",
+                url: this.issueUrl(jiraKey),
+                headers: {
+                    'Accept': "application/json",
+                    'Content-Type': 'application/json',
+                    'Accept-Encoding': '',
+                    'Authorization': `Bearer ${this.jiraPassword}`
+                },
+                httpAgent: new https.Agent({ rejectUnauthorized: false })
+            }
         }
-        return config;
     }
 
     private updateCommitWithJiraResponse(commit: GitCommit, data: JiraRepsonse):GitCommit{
