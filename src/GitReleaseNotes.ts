@@ -41,6 +41,15 @@ export class GitReleaseNotes {
         });
     }
 
+    async getNotesStringWithJira(sha:string):Promise<string>{
+        const notes = await this.getNotesWithJira(sha);
+        var notesString= "";
+        notes.forEach(n=>{
+            notesString += n + "\n";
+        });
+        return notesString;
+    }
+
     getNoteString(commit:GitCommit):string{
         return  `${this.getJIRAKeyString(commit)}: ${this.getGitJiraSummary(commit)}`;
     }

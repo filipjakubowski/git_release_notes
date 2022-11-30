@@ -1,7 +1,15 @@
 import {GitCommit} from "../types/GitCommit";
 
 import axios, {AxiosRequestConfig} from "axios";
+const https = require('https');
+import fs from 'fs';
+
 import {JiraRepsonse} from "../types/JiraRepsonse";
+
+export enum JiraTypeEnum {
+    CLOUD,
+    SERVER,
+}
 
 export class JiraAdapter {
     static JIRA_ISSUE_REGEXP = "$KEYS-\\d+";
@@ -10,11 +18,13 @@ export class JiraAdapter {
     jiraURL: string;
     jiraPassword: string;
     jiraUsername: string;
+    jiraType: JiraTypeEnum;
 
-    constructor(url:string, username:string, password: string) {
+    constructor(url:string, username:string, password: string, jiraType: JiraTypeEnum = JiraTypeEnum.CLOUD) {
         this.jiraURL = url;
         this.jiraUsername = username;
         this.jiraPassword = password;
+        this.jiraType = jiraType;
     }
 
     addProjectKey(key:string){
@@ -46,7 +56,7 @@ export class JiraAdapter {
 
         try {
             const response = await axios(axiosReqConf);
-            commit = this.updateCommiitWithJiraResponse(commit,response.data);
+            commit = this.updateCommitWithJiraResponse(commit,response.data);
             return commit;
         }
         catch (error){
@@ -57,7 +67,7 @@ export class JiraAdapter {
     }
 
     private axiosConfigForJiraKey(jiraKey: string): AxiosRequestConfig{
-        return {
+        const config = {
             method: "GET",
             url: this.issueUrl(jiraKey),
             auth: {
@@ -69,10 +79,15 @@ export class JiraAdapter {
                 'Content-Type': 'application/json',
                 'Accept-Encoding': ''
             },
+            httpAgent: new https.Agent()
         }
+        if(this.jiraType == JiraTypeEnum.SERVER){
+            config.httpAgent = new https.Agent({ rejectUnauthorized: false })
+        }
+        return config;
     }
 
-    private updateCommiitWithJiraResponse(commit: GitCommit, data: JiraRepsonse):GitCommit{
+    private updateCommitWithJiraResponse(commit: GitCommit, data: JiraRepsonse):GitCommit{
         commit.summary = data.fields.summary;
         commit.jiraStatus = data.fields.status.name;
         commit.jiraUrl = `${this.jiraURL}/browse/${commit.jiraKey}`;
@@ -80,6 +95,13 @@ export class JiraAdapter {
     }
 
     private issueUrl(jiraKey:string){
-        return `${this.jiraURL}/rest/api/3/issue/${jiraKey}`;
+        switch(this.jiraType){
+            case JiraTypeEnum.CLOUD: {
+                return `${this.jiraURL}/rest/api/3/issue/${jiraKey}`;
+            }
+            case JiraTypeEnum.SERVER: {
+                return `${this.jiraURL}/rest/agile/1.0/issue/${jiraKey}`;
+            }
+        }
     }
 }

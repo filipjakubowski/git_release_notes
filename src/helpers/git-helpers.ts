@@ -23,8 +23,7 @@ function gitLogToGitCommit(commitSting:string){
 
 export async function getCommits(sha: string): Promise<GitCommit[]> {
     let commits: GitCommit[] = [];
-    let times = 0;
-    let buffer: string =""
+    let buffer: string = ""
     let commitLines: string[] = [];
 
     const options = {
