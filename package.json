@@ -1,8 +1,9 @@
 {
-  "name": "release_notes",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@bamboostick/git_release_notes",
+  "version": "0.1.7",
+  "author": "@filipjakubowski",
+  "description": "Release Notes build strategies combining git and ticketing systems like JIRA.",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf ./dist && tsc",
@@ -11,8 +12,10 @@
     "lint": "eslint . --ext .ts",
     "lint-and-fix": "eslint . --ext .ts --fix"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "Git",
+    "JIRA"
+  ],
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^18.11.9",
@@ -29,6 +32,6 @@
     "@actions/exec": "^1.1.1",
     "@actions/github": "^5.1.1",
     "@octokit/rest": "^19.0.5",
-    "axios": "^1.2.0"
+    "axios": "~1.1.3"
   }
 }
