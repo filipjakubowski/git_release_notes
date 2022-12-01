@@ -15,6 +15,10 @@ function gitLogToGitCommit(commitSting:string){
         title: lines[5]?.trim(),
     } as GitCommit;
 
+    if(gc.author == undefined){
+        throw Error("error reding: " + commitSting);
+    }
+
     if(lines.length > 6){
         gc.message = lines[6].trim()
     }
@@ -32,11 +36,15 @@ export async function getCommits(fromSha: string, toSha: string): Promise<GitCom
                 if(data != undefined){
                     const newBuffer = buffer + data.toString();
                     buffer =  "";
-                    const bufferSplit = newBuffer.split("commit ")
-                    // this entry might be not finished
-                    buffer += "commit " + bufferSplit.pop();
-                    bufferSplit.forEach(trimmedCommitLine => {
-                        commitLines.push("commit " + trimmedCommitLine);
+                    const bufferSplit = newBuffer.split("\n")
+                    bufferSplit.forEach((bufferLine) => {
+                        if(bufferLine.match(/^commit \W{40}/)){
+                            commitLines.push(buffer);
+                            buffer = bufferLine;
+                        }
+                        else {
+                            buffer += bufferLine + "\n";
+                        }
                     })
                 }
             },
