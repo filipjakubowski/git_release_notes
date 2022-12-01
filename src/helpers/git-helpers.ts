@@ -4,15 +4,15 @@ import {GitCommit} from "../types/GitCommit";
 function gitLogToGitCommit(commitSting:string){
     const lines = commitSting
         .split("\n")
-        .filter( line => line.length > 0);
+        .filter( line => line.length > 1);
 
     let gc = {
-        commit: lines[0].split(" ")[1].trim(),
-        author: lines[1].split(":")[1].trim(),
-        authorDateString: lines[2].split(":")[1].trim(),
-        authorHandle: lines[3].split(":")[1].trim(),
-        commitDateString: lines[4].split(":")[1].trim(),
-        title: lines[5].trim(),
+        commit: lines[0]?.split(" ")[1]?.trim(),
+        author: lines[1]?.split(":")[1]?.trim(),
+        authorDateString: lines[2]?.split(":")[1]?.trim(),
+        authorHandle: lines[3]?.split(":")[1]?.trim(),
+        commitDateString: lines[4]?.split(":")[1]?.trim(),
+        title: lines[5]?.trim(),
     } as GitCommit;
 
     if(lines.length > 6){
@@ -21,7 +21,7 @@ function gitLogToGitCommit(commitSting:string){
     return gc;
 }
 
-export async function getCommits(fronSha: string, toSha: string): Promise<GitCommit[]> {
+export async function getCommits(fromSha: string, toSha: string): Promise<GitCommit[]> {
     let commits: GitCommit[] = [];
     let buffer: string = ""
     let commitLines: string[] = [];
@@ -29,14 +29,16 @@ export async function getCommits(fronSha: string, toSha: string): Promise<GitCom
     const options = {
         listeners: {
             stdout: (data: Buffer) => {
-                const newBuffer = buffer + data.toString();
-                buffer =  "";
-                const bufferSplit = newBuffer.split("commit ")
-                // this entry might be not finished
-                buffer += "commit " + bufferSplit.pop();
-                bufferSplit.forEach(trimmedCommitLine => {
-                    commitLines.push("commit " + trimmedCommitLine);
-                })
+                if(data != undefined){
+                    const newBuffer = buffer + data.toString();
+                    buffer =  "";
+                    const bufferSplit = newBuffer.split("commit ")
+                    // this entry might be not finished
+                    buffer += "commit " + bufferSplit.pop();
+                    bufferSplit.forEach(trimmedCommitLine => {
+                        commitLines.push("commit " + trimmedCommitLine);
+                    })
+                }
             },
             stderr: (data: Buffer) => {
                 console.log(`Command Error: ${data.toString()}`);
@@ -44,7 +46,7 @@ export async function getCommits(fronSha: string, toSha: string): Promise<GitCom
         }
     };
 
-    const args: string[] = ["log", "--format=fuller", `${fronSha}..${toSha}`];
+    const args: string[] = ["log", "--format=fuller", `${fromSha}..${toSha}`];
     try{
         await exec.exec("git", args, options);
     }

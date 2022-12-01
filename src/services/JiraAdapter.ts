@@ -19,7 +19,7 @@ export class JiraAdapter {
     jiraUsername: string;
     jiraType: JiraTypeEnum;
 
-    constructor(url:string, username:string, password: string, jiraType: JiraTypeEnum = JiraTypeEnum.CLOUD) {
+    constructor(url:string, username:string, password:string, jiraType:JiraTypeEnum = JiraTypeEnum.CLOUD) {
         this.jiraURL = url;
         this.jiraUsername = username;
         this.jiraPassword = password;
