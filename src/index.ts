@@ -17,6 +17,7 @@ module.exports = {
         let notesString:string = "";
 
         (async () => {
+            console.log("Test run");
             let notes:any;
             notes = await rn.getNotesStringWithJira(fromSha, toSha);
             console.log("Notes:");
