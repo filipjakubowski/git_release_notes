@@ -1,6 +1,8 @@
 import {GithubAdapter} from "./services/GithubAdapter";
-import {GitCommit} from "./types/GitCommit";
+import {GitCommit} from "./types/git/GitCommit";
 import {JiraAdapter} from "./services/JiraAdapter";
+import {JiraCommitInterface} from "./types/jira/JiraCommitInterface";
+import {GithubCommit} from "./types/github/GithubCommit";
 
 export class GitReleaseNotes {
     gitAdapter: GithubAdapter;
@@ -35,36 +37,65 @@ export class GitReleaseNotes {
             console.log(error);
         }
 
-        commits = await this.jiraAdapter.fillFromJira(commits);
+        commits = await this.jiraAdapter.fillFromJira(commits) as GitCommit[];
         return commits.map((c) => {
             return this.getNoteString(c);
         });
     }
 
-    async getNotesStringWithJira(fromSha:string, toSha: string):Promise<string>{
-        const notes = await this.getNotesWithJira(fromSha, toSha);
-        var notesString= "";
+    async getNotesWithJiraFromGithubCommits(githubCommits: GithubCommit[]):Promise<string[]>{
+        let filteredCommits = githubCommits.filter(commit => {
+            const matchResult = commit.message.match(this.jiraAdapter.getJIRARegexp());
+            if(matchResult != null) {
+                commit.jiraKey = matchResult[0];
+            }
+            return matchResult != null;
+        });
+
+        let commits = await this.jiraAdapter.fillFromJira(filteredCommits);
+        return commits.map((c) => {
+            return this.getNoteString(c as JiraCommitInterface);
+        });
+    }
+
+    async getNotesStingWithJitaFromGithubCommits(githubCommits: GithubCommit[]):Promise<string>{
+        const notes = await this.getNotesWithJiraFromGithubCommits(githubCommits);
+        let notesString= "";
         notes.forEach(n=>{
             notesString += n + "\n";
         });
         return notesString;
     }
 
-    getNoteString(commit:GitCommit):string{
+    async getNotesStringWithJira(fromSha:string, toSha: string):Promise<string>{
+        const notes = await this.getNotesWithJira(fromSha, toSha);
+        let notesString= "";
+        notes.forEach(n=>{
+            notesString += n + "\n";
+        });
+        return notesString;
+    }
+
+    getNoteString(commit:JiraCommitInterface):string{
         return  `${this.getJIRAKeyString(commit)}: ${this.getGitJiraSummary(commit)}`;
     }
 
-    getJIRAKeyString(commit:GitCommit):string {
+    getJIRAKeyString(commit:JiraCommitInterface):string {
         return `[${commit.jiraKey}](${commit.jiraUrl})`
     }
 
-    getGitJiraSummary(commit:GitCommit):string{
-        if(commit.summary){
-            return `${commit.summary} [${commit.jiraStatus}]`
+    getGitJiraSummary(commit:JiraCommitInterface):string{
+        if(commit.jiraSummary){
+            return `${commit.jiraSummary} [${commit.jiraStatus}]`
         }
         else {
-            return `${commit.title}`
+            if(commit.title){
+                return commit.title;
+            }
+            else if(commit.message){
+                return commit.message;
+            }
+            return "";
         }
     }
-
 }

@@ -7,7 +7,7 @@ export interface GitCommit {
     title: string,
     message?: string,
     jiraKey?: string,
-    summary?: string,
+    jiraSummary?: string,
     jiraStatus?: string
     jiraUrl?: string
 }

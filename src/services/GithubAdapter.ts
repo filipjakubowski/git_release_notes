@@ -1,5 +1,5 @@
 import {getCommits} from "../helpers/git-helpers";
-import {GitCommit} from "../types/GitCommit";
+import {GitCommit} from "../types/git/GitCommit";
 
 export class GithubAdapter {
     async getCommitsSinceSha(fromSha:string, toSha: string):Promise<GitCommit[]>{

@@ -1,9 +1,8 @@
-import {GitCommit} from "../types/GitCommit";
-
-import axios, {AxiosRequestConfig} from "axios";
+import axios, {AxiosRequestConfig} from 'axios';
 const https = require('https');
 
-import {JiraRepsonse} from "../types/JiraRepsonse";
+import {JiraRepsonse} from "../types/jira/JiraRepsonse";
+import {JiraCommitInterface} from "../types/jira/JiraCommitInterface";
 
 export enum JiraTypeEnum {
     CLOUD,
@@ -36,7 +35,7 @@ export class JiraAdapter {
         return new RegExp(regString);
     }
 
-     async fillFromJira(commits: GitCommit[]):Promise<GitCommit[]>{
+     async fillFromJira(commits: JiraCommitInterface[]):Promise<JiraCommitInterface[]>{
 
          await Promise.all(commits.map(async (commit) => {
              try{
@@ -49,7 +48,7 @@ export class JiraAdapter {
         return commits;
     }
 
-    async getJiraIssue(commit: GitCommit):Promise<GitCommit>{
+    async getJiraIssue(commit: JiraCommitInterface):Promise<JiraCommitInterface>{
         if(commit.jiraKey == null) return commit;
         const axiosReqConf:AxiosRequestConfig = this.axiosConfigForJiraKey(commit.jiraKey);
 
@@ -96,8 +95,8 @@ export class JiraAdapter {
         }
     }
 
-    private updateCommitWithJiraResponse(commit: GitCommit, data: JiraRepsonse):GitCommit{
-        commit.summary = data.fields.summary;
+    private updateCommitWithJiraResponse(commit: JiraCommitInterface, data: JiraRepsonse):JiraCommitInterface{
+        commit.jiraSummary = data.fields.summary;
         commit.jiraStatus = data.fields.status.name;
         commit.jiraUrl = `${this.jiraURL}/browse/${commit.jiraKey}`;
         return commit;
