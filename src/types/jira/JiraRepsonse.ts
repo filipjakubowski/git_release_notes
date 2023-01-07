@@ -32,14 +32,28 @@ export interface JiraRepsonse {
             },
             outwardIssue: {
                 key: string,
-                summary: string,
-                status: {
-                    name: string
+                fields: {
+                    summary: string,
+                    status: {
+                        name: string
+                    },
+                    issuetype: {
+                        name: string,
+                    }
                 }
             },
-            issuetype: {
-                name: string,
-            }
+            inwardIssue: {
+                key: string,
+                fields: {
+                    summary: string,
+                    status: {
+                        name: string
+                    },
+                    issuetype: {
+                        name: string,
+                    }
+                },
+            },
         }]
     }
 }

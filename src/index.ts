@@ -44,6 +44,6 @@ module.exports = {
 module.exports.releaseNotesString("5b86e0","HEAD").then(
     (notesString: string)=>
     {
-        console.log(`!!!!: ${notesString}`);
+        console.log(`------------------\n${notesString}`);
     }
 );

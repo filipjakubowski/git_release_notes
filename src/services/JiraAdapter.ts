@@ -98,10 +98,21 @@ export class JiraAdapter {
         commit.jiraSummary = data.fields.summary;
         commit.jiraStatus = data.fields.status.name;
         commit.jiraUrl = `${this.jiraURL}/browse/${commit.jiraKey}`;
+        commit.type = data.fields.issuetype.name;
         commit.issueLinks = [];
+
 
         if(data.fields.issuelinks){
             commit.issueLinks = data.fields.issuelinks;
+
+            commit.issueLinks?.forEach((link) => {
+                if(link.outwardIssue){
+                    link.jiraUrl = `${this.jiraURL}/browse/${link.outwardIssue.key}`;
+                }
+                else if(link.inwardIssue){
+                    link.jiraUrl = `${this.jiraURL}/browse/${link.inwardIssue.key}`;
+                }
+            });
         }
 
         return commit;

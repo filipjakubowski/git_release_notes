@@ -4,14 +4,30 @@ export interface JiraLink {
         outward: string,
         inward: string
     },
-    outwardIssue: {
+    jiraUrl?: string,
+    outwardIssue?: {
         key: string,
-        summary: string,
-        status: {
-            name: string
+        fields: {
+            summary: string,
+            status: {
+                name: string
+
+            },
+            issuetype: {
+                name: string,
+            }
         }
-    },
-    issuetype: {
-        name: string,
+    }
+    inwardIssue?: {
+        key: string,
+        fields: {
+            summary: string,
+            status: {
+                name: string
+            },
+            issuetype: {
+                name: string,
+            }
+        },
     }
 }
