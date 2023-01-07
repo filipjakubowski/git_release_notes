@@ -3,6 +3,7 @@ import {GitCommit} from "./types/git/GitCommit";
 import {JiraAdapter} from "./services/JiraAdapter";
 import {JiraCommitInterface} from "./types/jira/JiraCommitInterface";
 import {GithubCommit} from "./types/github/GithubCommit";
+import {ReleaseNotesStringFactory} from "./services/ReleaseNotesStringFactory";
 
 export class GitReleaseNotes {
     gitAdapter: GithubAdapter;
@@ -32,6 +33,7 @@ export class GitReleaseNotes {
         let commits:GitCommit[] =[];
         try {
             commits = await this.getNotesFromSha(fromSha, toSha);
+            commits = this.removeGitCommitDuplicates(commits);
         }
         catch (error){
             console.log(error);
@@ -39,7 +41,7 @@ export class GitReleaseNotes {
 
         commits = await this.jiraAdapter.fillFromJira(commits) as GitCommit[];
         return commits.map((c) => {
-            return this.getNoteString(c);
+            return ReleaseNotesStringFactory.getReleaseNotesString(c);
         });
     }
 
@@ -52,14 +54,17 @@ export class GitReleaseNotes {
             return matchResult != null;
         });
 
+        filteredCommits = this.removeGithubCommitDuplicates(filteredCommits);
+
         let commits = await this.jiraAdapter.fillFromJira(filteredCommits);
         return commits.map((c) => {
-            return this.getNoteString(c as JiraCommitInterface);
+            return ReleaseNotesStringFactory.getReleaseNotesString(c as JiraCommitInterface);
         });
     }
 
     async getNotesStingWithJitaFromGithubCommits(githubCommits: GithubCommit[]):Promise<string>{
-        const notes = await this.getNotesWithJiraFromGithubCommits(githubCommits);
+        const filteredCommits = this.removeGithubCommitDuplicates(githubCommits);
+        const notes = await this.getNotesWithJiraFromGithubCommits(filteredCommits);
         let notesString= "";
         notes.forEach(n=>{
             notesString += n + "\n";
@@ -76,26 +81,31 @@ export class GitReleaseNotes {
         return notesString;
     }
 
-    getNoteString(commit:JiraCommitInterface):string{
-        return  `${this.getJIRAKeyString(commit)}: ${this.getGitJiraSummary(commit)}`;
+
+    private removeGithubCommitDuplicates(commits: GithubCommit[] ):   GithubCommit[]  {
+
+        let filteredComits:GithubCommit[] = [];
+        commits.filter((commit) => {
+            if(filteredComits.findIndex((c) => {
+                return c.jiraKey === commit.jiraKey;
+            }) === -1){
+                filteredComits.push(commit);
+            }
+        });
+        return filteredComits;
     }
 
-    getJIRAKeyString(commit:JiraCommitInterface):string {
-        return `[${commit.jiraKey}](${commit.jiraUrl})`
-    }
+    private removeGitCommitDuplicates(commits: GitCommit[] ):   GitCommit[]  {
+        console.log("removeGitCommitDuplicates");
+        let filteredComits:GitCommit[] = [];
+        commits.filter((commit) => {
+            if(filteredComits.findIndex((c) => {
+                return c.jiraKey === commit.jiraKey;
+            }) === -1){
+                filteredComits.push(commit);
+            }
+        });
 
-    getGitJiraSummary(commit:JiraCommitInterface):string{
-        if(commit.jiraSummary){
-            return `${commit.jiraSummary} [${commit.jiraStatus}]`
-        }
-        else {
-            if(commit.title){
-                return commit.title;
-            }
-            else if(commit.message){
-                return commit.message;
-            }
-            return "";
-        }
+        return filteredComits;
     }
 }

@@ -13,6 +13,7 @@ export class JiraAdapter {
     static JIRA_ISSUE_REGEXP = "$KEYS-\\d+";
 
     projectKeys:string[] = [];
+    parent: { [id: string] : IPerson; } = {};
     jiraURL: string;
     jiraPassword: string;
     jiraUsername: string;
@@ -36,10 +37,9 @@ export class JiraAdapter {
     }
 
      async fillFromJira(commits: JiraCommitInterface[]):Promise<JiraCommitInterface[]>{
-
          await Promise.all(commits.map(async (commit) => {
              try{
-                 await this.getJiraIssue(commit);
+                 const jiraIssue = await this.fetchJiraIssue(commit);
              }
              catch (error){
                  console.log(error);
@@ -48,7 +48,7 @@ export class JiraAdapter {
         return commits;
     }
 
-    async getJiraIssue(commit: JiraCommitInterface):Promise<JiraCommitInterface>{
+    async fetchJiraIssue(commit: JiraCommitInterface):Promise<JiraCommitInterface>{
         if(commit.jiraKey == null) return commit;
         const axiosReqConf:AxiosRequestConfig = this.axiosConfigForJiraKey(commit.jiraKey);
 
@@ -99,6 +99,11 @@ export class JiraAdapter {
         commit.jiraSummary = data.fields.summary;
         commit.jiraStatus = data.fields.status.name;
         commit.jiraUrl = `${this.jiraURL}/browse/${commit.jiraKey}`;
+        commit.issueLinks = [];
+        if(data.fields.issuelinks){
+            commit.issueLinks = data.fields.issuelinks;
+        }
+
         return commit;
     }
 

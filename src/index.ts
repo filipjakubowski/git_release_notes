@@ -14,9 +14,7 @@ async function releaseNotesString(fromSha: string, toSha: string) {
     let ja = new JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
     ja.addProjectKey(jiraProjectKey);
     let rn = new GitReleaseNotes(ga,ja);
-    let notesString = await rn.getNotesStringWithJira(fromSha, toSha);
-
-    return  notesString;
+    return await rn.getNotesStringWithJira(fromSha, toSha);
 }
 
 async function releaseNotesStringFromCommits(githubCommits: GithubCommit[]){
@@ -30,8 +28,7 @@ async function releaseNotesStringFromCommits(githubCommits: GithubCommit[]){
     let ja = new JiraAdapter(jiraUrl, jiraUser, jiraPat, jiraType);
     ja.addProjectKey(jiraProjectKey);
     let rn = new GitReleaseNotes(ga,ja);
-    let notesString:string = await rn.getNotesStingWithJitaFromGithubCommits(githubCommits);
-    return
+    return await rn.getNotesStingWithJitaFromGithubCommits(githubCommits);
 }
 
 module.exports = {
@@ -44,5 +41,9 @@ module.exports = {
     }
 };
 
-let notes = await module.exports.releaseNotesString("5b86e0","HEAD");
-console.log(`Notes: ${notes}`);
+module.exports.releaseNotesString("5b86e0","HEAD").then(
+    (notesString: string)=>
+    {
+        console.log(`!!!!: ${notesString}`);
+    }
+);

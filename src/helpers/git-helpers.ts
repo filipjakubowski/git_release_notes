@@ -1,11 +1,13 @@
 import * as exec from "@actions/exec";
-import {GitCommit} from "../types/GitCommit";
+import {GitCommit} from "../types/git/GitCommit";
 
 function gitLogToGitCommit(commitSting:string){
     const lines = commitSting
         .split("\n")
         .filter( line => line.length > 1);
 
+    console.log("mapping commit");
+    console.log(lines);
     let gc = {
         commit: lines[0]?.split(" ")[1]?.trim(),
         author: lines[1]?.split(":")[1]?.trim(),
@@ -38,9 +40,11 @@ export async function getCommits(fromSha: string, toSha: string): Promise<GitCom
                     buffer =  "";
                     const bufferSplit = newBuffer.split("\n")
                     bufferSplit.forEach((bufferLine) => {
-                        if(bufferLine.match(/^commit \W{40}/)){
+                        console.log(bufferLine);
+                        const match = bufferLine.match(/^commit \w{40}/);
+                        if(match != undefined){
                             commitLines.push(buffer);
-                            buffer = bufferLine;
+                            buffer = bufferLine + "\n";
                         }
                         else {
                             buffer += bufferLine + "\n";
