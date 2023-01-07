@@ -24,5 +24,22 @@ export interface JiraRepsonse {
         reporter: {
             displayName: string
         },
+        issuelinks: [{
+            type: {
+                name: string,
+                outward: string,
+                inward: string
+            },
+            outwardIssue: {
+                key: string,
+                summary: string,
+                status: {
+                    name: string
+                }
+            },
+            issuetype: {
+                name: string,
+            }
+        }]
     }
 }
