@@ -6,8 +6,8 @@ function gitLogToGitCommit(commitSting:string){
         .split("\n")
         .filter( line => line.length > 1);
 
-    console.log("mapping commit");
-    console.log(lines);
+    // console.log("mapping commit");
+    // console.log(lines);
     let gc = {
         commit: lines[0]?.split(" ")[1]?.trim(),
         author: lines[1]?.split(":")[1]?.trim(),
