@@ -81,6 +81,19 @@ export class GitReleaseNotes {
         return notesString;
     }
 
+    async getNotesStringWithJiraFromText(text:string):Promise<string[]>{
+        const matchResult = text.match(this.jiraAdapter.getJIRARegexp());
+        let jireIssues:JiraCommitInterface[] = [];
+        if(matchResult != null) {
+            matchResult.forEach( (jiraKey) => {
+                jireIssues.push({jiraKey: jiraKey} as JiraCommitInterface);
+            });
+        }
+        return jireIssues.map((c) => {
+            return ReleaseNotesStringFactory.getReleaseNotesString(c);
+        });
+    }
+
 
     private removeGithubCommitDuplicates(commits: GithubCommit[] ):   GithubCommit[]  {
 
