@@ -1,6 +1,6 @@
 {
   "name": "@bamboostick/git_release_notes",
-  "version": "0.1.30  ",
+  "version": "0.1.31  ",
   "author": "@filipjakubowski",
   "description": "Release Notes build strategies combining git and ticketing systems like JIRA.",
   "main": "./dist/index.js",
