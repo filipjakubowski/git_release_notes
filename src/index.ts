@@ -40,7 +40,7 @@ function areEnvVarsSet() : boolean {
     return true;
 }
 
-async function releaseNotesString(fromSha: string, toSha: string,gitBranchName: string) {
+async function releaseNotesString(fromSha: string, toSha: string) {
     if(areEnvVarsSet()){
         return;
     }
@@ -58,7 +58,7 @@ async function releaseNotesString(fromSha: string, toSha: string,gitBranchName: 
     return await rn.getNotesStringWithJira(fromSha, toSha);
 }
 
-async function releaseNotesStringFromCommits(githubCommits: GithubCommit[],gitBranchName: string){
+async function releaseNotesStringFromCommits(githubCommits: GithubCommit[]){
     if(process.env.LOG_LEVEL == "DEBUG") console.log("Getting release notes from commits");
     if(areEnvVarsSet()){
         return;
