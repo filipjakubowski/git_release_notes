@@ -26,7 +26,7 @@ export class JiraAdapter {
     }
 
     addProjectKey(key:string){
-        console.log(`Adding project key ${key.toUpperCase()}`);
+        console.log(`Adding project key: ${key}`);
         this.projectKeys.push((key.toUpperCase()));
     }
 
