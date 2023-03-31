@@ -31,6 +31,9 @@ export class JiraAdapter {
     }
 
     getJIRARegexp(){
+        if(this.projectKeys.length == 0){
+            throw new Error("No projectKeys set");
+        }
         const keyRegPattern = this.projectKeys.join("|");
         const regString = JiraAdapter.JIRA_ISSUE_REGEXP.replace("$KEYS", keyRegPattern);
         return new RegExp(regString);

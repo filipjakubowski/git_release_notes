@@ -27,17 +27,14 @@ function areEnvVarsSet() : boolean {
     }
 
     if ( process.env.IS_JIRA_SERVER == null ){
-        validVars = false;
         console.log("Missing IS_JIRA_SERVER env var");
     }
 
-    if(!validVars)
-    {
-        console.log("Missing env vars");
-        return false;
+    if(validVars){
+        return true
     }
 
-    return true;
+    return false;
 }
 
 async function releaseNotesString(fromSha: string, toSha: string) {
